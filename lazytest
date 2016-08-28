@@ -11,14 +11,14 @@ use warnings;
 
 print <<'EOF';
 #!/bin/bash
-testcase() {
-  local actual="$(eval "$@")"
+lazytest_case() {
+  local actual="$(eval "$1")"
   local expected="$(cat <&3)"
   if [[ "$actual" = "$expected" ]]; then
-    echo "PASS $*"
+    echo "$1" | tr '\n' ' '; echo
     return 0
   else
-    echo "FAIL $*: expected '$expected', got '$actual'"
+    echo -e "\033[1;31mFAIL\033[0;0m $*: expected '$expected', got '$actual'"
     return 1
   fi
 }
@@ -28,13 +28,12 @@ EOF
 while (<>) {
   next unless (/^\`\`\`bash/../^\`\`\`$/) && !/^\`\`\`/;
 
-  if (s/^\$\s+/LAZYTEST_EOF\ntestcase /) {
+  if (s/^\$\s+//) {
     # We've got a shell command, so read it along with any heredocs we have.
-    # Assume all multiline strings are single-quoted.
-    my $command = $_;
-    $command .= ($_ = <>) while 1 & length($command =~ s/[^']//gr);
-    $command =~ s/\s#.*//;
-    $command =~ s/\n$/ 3<<'LAZYTEST_EOF'\n/;
+    # Assume all multiline strings are single-quoted, and that an odd number of
+    # single-quotes means that we're still inside a string.
+    print "LAZYTEST_EOF\n";
+    $_ .= <> while 1 & length s/[^']//gr;
 
     # At this point we've appended our heredoc to the test wrapper, so we
     # should be all set. Look for previous heredocs and scan forwards until
@@ -49,12 +48,12 @@ while (<>) {
     # rab $
     # fib
 
-    if ($command =~ /[^3]\<\<'?(\w+)'?/) {
+    if (/\<\<'?(\w+)'?/) {
       my $hd = $1;
-      $command .= $_ while 1../^$hd\n$/;
+      $_ .= <> until /\n$hd\n$/;
     }
 
-    print $command;
+    print "lazytest_case '" . s/'/'\\''/gr . "' 3<<'LAZYTEST_EOF'\n";
   } else {
     print;
   }
