@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+# Usage:
+# $ lazytest [markdown-files...] > test.sh
+# $ bash test.sh || echo 'uh oh, something failed'
+#
+# Looks specifically for ```bash, not ```sh. So you have the option to fence
+# with just ```sh if you want syntax highlighting but no test coverage.
+
+use strict;
+use warnings;
+
+print <<'EOF';
+#!/bin/bash
+testcase() {
+  local actual="$(eval "$@")"
+  local expected="$(cat <&3)"
+  if [[ "$actual" = "$expected" ]]; then
+    echo "PASS $*"
+    return 0
+  else
+    echo "FAIL $*: expected '$expected', got '$actual'"
+    return 1
+  fi
+}
+cat <<'LAZYTEST_EOF'
+EOF
+
+while (<>) {
+  next unless (/^\`\`\`bash/../^\`\`\`$/) && !/^\`\`\`/;
+
+  if (s/^\$\s+/LAZYTEST_EOF\ntestcase /) {
+    # We've got a shell command, so read it along with any heredocs we have.
+    # Assume all multiline strings are single-quoted.
+    my $command = $_;
+    $command .= ($_ = <>) while 1 & length($command =~ s/[^']//gr);
+    $command =~ s/\s#.*//;
+    $command =~ s/\n$/ 3<<'LAZYTEST_EOF'\n/;
+
+    # At this point we've appended our heredoc to the test wrapper, so we
+    # should be all set. Look for previous heredocs and scan forwards until
+    # they end -- that way we won't break the test case for things like this:
+    #
+    # $ rev <<'EOF'
+    # foo
+    # $ bar
+    # bif
+    # EOF
+    # oof
+    # rab $
+    # fib
+
+    if ($command =~ /[^3]\<\<'?(\w+)'?/) {
+      my $hd = $1;
+      $command .= $_ while 1../^$hd\n$/;
+    }
+
+    print $command;
+  } else {
+    print;
+  }
+}
+
+print "LAZYTEST_EOF\n";
