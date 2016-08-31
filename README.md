@@ -47,6 +47,17 @@ multiline single- FTW
 quoted strings FTW
 ```
 
+### Line continuations
+```bash
+$ seq 1 \
+      5
+1
+2
+3
+4
+5
+```
+
 ### Heredocs
 You can have a heredoc and lazytest will figure out where it ends:
 
