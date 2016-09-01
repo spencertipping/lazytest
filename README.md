@@ -35,16 +35,27 @@ LazyTest is pretty good at figuring out what's a command and what's
 expected-output, but there are a few things that can throw it off. First,
 things that work:
 
-### Multiline single-quoted strings
+### Multiline strings
 These work most of the time because lazytest reads until it has an even number
-of them. There are ways to confuse it, for example stuff like `echo "that's
-confusing"`.
+of them.
 
 ```bash
 $ echo 'multiline single-
 quoted strings' | perl -lne 'print "$_ FTW"'
 multiline single- FTW
 quoted strings FTW
+```
+
+```bash
+$ echo "that's confusing"
+that's confusing
+```
+
+```bash
+$ echo "it's also possible
+to have multiline double quoted strings"
+it's also possible
+to have multiline double quoted strings
 ```
 
 ### Line continuations
