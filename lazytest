@@ -26,6 +26,7 @@ lazytest_case() {
   else
     lazytest_fail=$((lazytest_fail + 1))
     echo -e "\033[J\033[1;31mFAIL\033[0;0m $*"
+    echo -e "\033[1;31m$lazytest_file:$lazytest_line\033[0;0m"
     echo -e "EXPECTED\033[1;34m"
     echo    "$expected"
     echo
@@ -62,6 +63,7 @@ while (<>) {
     # Assume all multiline strings are single-quoted, and that an odd number of
     # single-quotes means that we're still inside a string.
     print "LAZYTEST_EOF\n";
+    print "lazytest_file='$ARGV'\nlazytest_line=$.\n";
     $_ .= <> while line_continues $_;
 
     # At this point we've appended our heredoc to the test wrapper, so we
