@@ -55,7 +55,9 @@ sub line_continues {
     or length(s/\(//gr) - length(s/\)//gr);
 }
 
+my $argv = @ARGV;
 while (<>) {
+  $. = 1, $argv = @ARGV unless $argv == @ARGV;
   next unless (/^\`\`\`bash/../^\`\`\`$/) && !/^\`\`\`/;
 
   if (s/^\$\s+//) {
