@@ -84,3 +84,37 @@ is
 a
 test
 ```
+
+## Conditionals
+Anything you put into a `lazytest` code block will appear verbatim in the
+compiled script. This makes it possible to conditionalize execution for things;
+for example:
+
+```lazytest
+# Skip over the following stuff because it's lame
+if false; then
+```
+
+```bash
+$ echo hi               # a noncompliant echo
+nope
+```
+
+```lazytest
+fi
+```
+
+Similarly, you can use for-loops:
+
+```lazytest
+for i in `seq 100`; do
+```
+
+```bash
+$ echo the same test
+the same test
+```
+
+```lazytest
+done
+```
