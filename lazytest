@@ -93,9 +93,9 @@ while (<>) {
     # rab $
     # fib
 
-    if (/\<\<'?(\w+)'?/) {
+    if (/[^\<]\<\<'?(\w+)'?/) {
       my $hd = $1;
-      $_ .= <> until /\n$hd\n$/;
+      $_ .= <> until eof or /\n$hd\n$/;
     }
 
     print "lazytest_case '" . s/'/'\\''/gr . "' 3<<'LAZYTEST_EOF'\n";
