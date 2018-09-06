@@ -1,4 +1,6 @@
 # LazyTest: tests for developers too lazy to write them
+[MIT license as usual](LICENSE)
+
 I don't mind writing documentation that includes examples, but I don't really
 like to write tests. LazyTest finds `bash` fenced code regions in Markdown
 files and interprets them as examples that should produce the demonstrated
