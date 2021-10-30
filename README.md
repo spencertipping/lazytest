@@ -87,6 +87,12 @@ a
 test
 ```
 
+### `/dev/null` on stdin
+```bash
+$ wc -l
+0
+```
+
 ## Conditionals
 Anything you put into a `lazytest` code block will appear verbatim in the
 compiled script. This makes it possible to conditionalize execution for things;
